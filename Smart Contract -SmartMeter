@@ -1,0 +1,56 @@
+// SPDX-License-Identifier: GPL-3.0
+
+pragma solidity >=0.4.16 <0.9.0;
+
+contract SmartMeter {
+
+    string public storedData;  // Stores the meter data in hexadecimal format
+    string private password;   // Password for authorization
+    string public location;    // Location in "longitude,latitude" format
+
+    address public owner;
+
+    constructor(string memory _password, string memory _longitude, string memory _latitude) {
+        owner = msg.sender;
+        password = _password;
+        location = string(abi.encodePacked(_longitude, ",", _latitude));
+    }
+
+    // Modifier to check if the sender is the owner
+    modifier onlyOwner() {
+        require(msg.sender == owner, "Only the owner can call this function.");
+        _;
+    }
+
+    // Modifier to check if the correct password is provided
+    modifier correctPassword(string memory _password) {
+        require(keccak256(abi.encodePacked(_password)) == keccak256(abi.encodePacked(password)), "Incorrect password.");
+        _;
+    }
+
+    // Function to set meter data (protected by password)
+    function meterData(string memory _data, string memory _password) public correctPassword(_password) {
+        require(bytes(_data).length == 108, "Data must be 108 hexadecimal characters.");
+        storedData = _data;
+    }
+
+    // Function to update location (owner only)
+    function updateLocation(string memory _longitude, string memory _latitude) public onlyOwner {
+        location = string(abi.encodePacked(_longitude, ",", _latitude));
+    }
+
+    // Function to change password (owner only)
+    function changePassword(string memory _newPassword) public onlyOwner {
+        password = _newPassword;
+    }
+
+    // Function to get stored data (anyone can view)
+    function getMeterData() public view returns (string memory) {
+        return storedData;
+    }
+
+    // Function to get location (anyone can view)
+    function getLocation() public view returns (string memory) {
+        return location;
+    }
+}

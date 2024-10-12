@@ -1,0 +1,220 @@
+!pip install web3
+
+!pip install "jsonschema<4.0"
+
+from web3 import Web3
+
+!pip3 install py-solc-x
+
+from solcx import compile_standard, install_solc
+
+from solcx import compile_source
+
+from web3 import EthereumTesterProvider
+
+from solcx import compile_standard, install_solc
+
+install_solc("0.8.0")
+
+from solcx import compile_source
+
+from web3 import Web3
+
+Web3
+
+!pip install eth-tester
+
+from web3 import EthereumTesterProvider
+
+EthereumTesterProvider
+
+w3=Web3(EthereumTesterProvider())
+
+
+
+w3.is_connected()
+
+provider_url='https://sepolia.infura.io/v3/c4340ff166d442efa85c23268ad85bb0'
+
+w3=Web3(Web3.HTTPProvider(provider_url))
+
+w3.is_connected()
+
+wallet='0x69473D132d60ef2EE391afB30a5C9A90c80df731'
+
+abi='''[
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_newPassword",
+				"type": "string"
+			}
+		],
+		"name": "changePassword",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_data",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_password",
+				"type": "string"
+			}
+		],
+		"name": "meterData",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_password",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_longitude",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_latitude",
+				"type": "string"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "constructor"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "string",
+				"name": "_longitude",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "_latitude",
+				"type": "string"
+			}
+		],
+		"name": "updateLocation",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getLocation",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getMeterData",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "location",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "owner",
+		"outputs": [
+			{
+				"internalType": "address",
+				"name": "",
+				"type": "address"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "storedData",
+		"outputs": [
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	}
+]'''
+
+contract_address='0x5e9c1B9275DEA873D87f2Ef127f33F5611cf8c29'
+
+contract_instance=w3.eth.contract(address=contract_address,abi=abi)
+
+private_key='0x'+'468441578b9f9d1a7fbd0a86e9d52b096fc01bad2b0dea7767fc26ef66d1bd61'
+
+hex_string = "abc82525916ea3493eb55e22cc9664e5597cf6c810f2fd7f7a12a6c3d80bc338c74165fbbc86e663937187ed88745b0bfe5abc004b8f"
+
+password = "12345678"
+
+meter_data_transaction = contract_instance.functions.meterData(hex_string, password).build_transaction({
+    # Include necessary transaction parameters like 'from', 'gas', 'gasPrice', 'nonce', etc.
+    'from': '0x69473D132d60ef2EE391afB30a5C9A90c80df731',
+   
+
+    "gasPrice":w3.eth.gas_price,
+
+    "chainId":11155111,
+
+    "from":wallet,
+
+    "nonce":(w3.eth.get_transaction_count(
+
+    wallet))
+
+})
+
+signed_transaction = w3.eth.account.sign_transaction(meter_data_transaction, private_key=private_key)
+
+# Send the signed transaction (note the correct attribute 'rawTransaction')
+transaction_hash = w3.eth.send_raw_transaction(signed_transaction.raw_transaction)
+
+# Wait for the transaction receipt
+transaction_receipt = w3.eth.wait_for_transaction_receipt(transaction_hash)
+
+# Print transaction hash and receipt
+print(f"Transaction Hash: {transaction_hash.hex()}")
+print(f"Transaction Receipt: {transaction_receipt}")
